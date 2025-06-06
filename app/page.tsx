@@ -1,21 +1,18 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { defaultChatStoreOptions } from "ai";
 import { z } from "zod";
 
 export default function Chat() {
   const { messages, append, status } = useChat({
-    chatStore: defaultChatStoreOptions({
-      dataPartSchemas: {
-        weather: z.object({
-          location: z.string().optional(),
-          temperature: z.number().optional(),
-          humidity: z.number().optional(),
-          windSpeed: z.number().optional(),
-        }),
-      },
-    }),
+    dataPartSchemas: {
+      weather: z.object({
+        location: z.string().optional(),
+        temperature: z.number().optional(),
+        humidity: z.number().optional(),
+        windSpeed: z.number().optional(),
+      }),
+    },
   });
 
   const weatherParts = messages
