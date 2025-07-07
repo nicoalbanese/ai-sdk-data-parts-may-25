@@ -1,3 +1,4 @@
+import { MyUIMessage } from "@/ai/types";
 import { openai } from "@ai-sdk/openai";
 import {
   convertToModelMessages,
@@ -8,20 +9,10 @@ import {
 } from "ai";
 import { z } from "zod";
 
-// Allow streaming responses up to 30 seconds
-export const maxDuration = 30;
-
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
-  const stream = createUIMessageStream({
-    onError: (error) => {
-      if (error instanceof Error) {
-        return error.message;
-      }
-      console.error(error);
-      return "An unknown error occurred.";
-    },
+  const stream = createUIMessageStream<MyUIMessage>({
     execute: ({ writer }) => {
       const result = streamText({
         model: openai("gpt-4o"),
@@ -33,7 +24,7 @@ export async function POST(req: Request) {
         tools: {
           weatherTool: tool({
             description: "Get the weather for a location",
-            parameters: z.object({}),
+            inputSchema: z.object({}),
             execute: async ({}, { toolCallId: id }) => {
               writer.write({
                 type: "data-weather",
@@ -63,7 +54,7 @@ export async function POST(req: Request) {
               writer.write({
                 type: "data-weather",
                 data: {
-                  weatherDescription: Math.random() > 0.5 ? "Sunny" : "Cloudy",
+                  description: Math.random() > 0.5 ? "Sunny" : "Cloudy",
                 },
                 id,
               });

@@ -1,19 +1,10 @@
 "use client";
 
+import { MyUIMessage } from "@/ai/types";
 import { useChat } from "@ai-sdk/react";
-import { z } from "zod";
 
 export default function Chat() {
-  const { messages, append, status } = useChat({
-    dataPartSchemas: {
-      weather: z.object({
-        location: z.string().optional(),
-        temperature: z.number().optional(),
-        humidity: z.number().optional(),
-        windSpeed: z.number().optional(),
-      }),
-    },
-  });
+  const { messages, sendMessage, status } = useChat<MyUIMessage>({});
 
   const weatherParts = messages
     .flatMap((message) =>
@@ -22,13 +13,11 @@ export default function Chat() {
     .at(-1);
 
   return (
-    <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
+    <div className="flex flex-col w-full max-w-lg overflow-x-hidden py-24 mx-auto stretch">
       <button
         className="bg-zinc-100 px-3 py-1 rounded-md disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         disabled={status !== "ready"}
-        onClick={() =>
-          append({ role: "user", parts: [{ text: "", type: "text" }] })
-        }
+        onClick={() => sendMessage({ text: "" })}
       >
         Trigger message
       </button>
@@ -36,7 +25,7 @@ export default function Chat() {
         <div className="mt-4 p-4 border border-zinc-100 rounded-lg">
           <pre>{JSON.stringify(weatherParts, null, 2)}</pre>
         </div>
-      )}{" "}
+      )}
     </div>
   );
 }
