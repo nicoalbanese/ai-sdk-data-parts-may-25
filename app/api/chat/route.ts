@@ -4,6 +4,8 @@ import {
   convertToModelMessages,
   createUIMessageStream,
   createUIMessageStreamResponse,
+  generateId,
+  stepCountIs,
   streamText,
   tool,
 } from "ai";
@@ -14,18 +16,23 @@ export async function POST(req: Request) {
 
   const stream = createUIMessageStream<MyUIMessage>({
     execute: ({ writer }) => {
+      writer.write({ type: "start" });
+      writer.write({ type: "start-step" });
+      const id = generateId();
+      writer.write({
+        type: "data-weather",
+        data: { description: "starting..." },
+        id,
+      });
       const result = streamText({
         model: openai("gpt-4o"),
         messages: convertToModelMessages(messages),
-        onError: (error) => {
-          console.error(error);
-        },
-        toolChoice: { toolName: "weatherTool", type: "tool" },
+        stopWhen: stepCountIs(5),
         tools: {
           weatherTool: tool({
             description: "Get the weather for a location",
             inputSchema: z.object({}),
-            execute: async ({}, { toolCallId: id }) => {
+            execute: async ({}) => {
               writer.write({
                 type: "data-weather",
                 data: {
@@ -63,7 +70,7 @@ export async function POST(req: Request) {
           }),
         },
       });
-      writer.merge(result.toUIMessageStream());
+      writer.merge(result.toUIMessageStream({ sendStart: false }));
     },
   });
 

@@ -1,5 +1,9 @@
-import { UIMessage, UITools } from "ai";
+import { InferUITools, ToolSet, UIMessage } from "ai";
 import z from "zod";
+
+const metadataSchema = z.object({});
+
+type MyMetadata = z.infer<typeof metadataSchema>;
 
 const dataPartSchema = z.object({
   weather: z.object({
@@ -13,4 +17,8 @@ const dataPartSchema = z.object({
 
 type MyDataPart = z.infer<typeof dataPartSchema>;
 
-export type MyUIMessage = UIMessage<never, MyDataPart, UITools>;
+const tools: ToolSet = {};
+
+type MyTools = InferUITools<typeof tools>;
+
+export type MyUIMessage = UIMessage<MyMetadata, MyDataPart, MyTools>;
