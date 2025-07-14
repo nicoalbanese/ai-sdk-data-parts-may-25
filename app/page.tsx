@@ -17,15 +17,18 @@ export default function Chat() {
       <button
         className="bg-zinc-100 px-3 py-1 rounded-md disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         disabled={status !== "ready"}
-        onClick={() => sendMessage({ text: "" })}
+        onClick={() => sendMessage({ text: "What's the weather in sf?" })}
       >
         Trigger message
       </button>
-      {weatherParts && (
+      {/* {weatherParts && (
         <div className="mt-4 p-4 border border-zinc-100 rounded-lg">
           <pre>{JSON.stringify(weatherParts, null, 2)}</pre>
         </div>
-      )}
+      )} */}
+      <div className="mt-4 p-4 border border-zinc-100 rounded-lg">
+        <pre>{JSON.stringify(messages, null, 2)}</pre>
+      </div>
     </div>
   );
 }
